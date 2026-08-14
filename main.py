@@ -10,7 +10,7 @@ user = []
 comp = []
 
 count_user = 0
-count_computer= 0
+count_comp= 0
 
 game = True
 
@@ -26,24 +26,31 @@ while blackjack:
         while game:
             print(f"Your cards: {user}, current score: {count_user}")
             print(f"Computers first cards: {comp}")
-            choice = input("Type 'y' to get another card, type 'n' to pass: " )
+            if count_user == 21:
+                choice = "n"
+            else:
+                choice = input("Type 'y' to get another card, type 'n' to pass: ")
             if choice == "y":
                 user.append(random.choice(cards))
                 count_user = 0
                 for add in user:
                     count_user += add
+                    if 11 in user and count_user > 21:
+                        user[user.index(11)] = 1
+                        count_user -= 10
                 for add in comp:
-                    count_computer += add
+                    count_comp += add
                 if count_user > 21:
                     print(f"Your final hand: {user}, current score: {count_user}")
-                    print(f"Computer's final hand: {comp}, final score: {count_computer}")
+                    print(f"Computer's final hand: {comp}, final score: {count_comp}")
                     print("You went over. You lose :(")
                     choice = input("Do u want to play a game of Blackjack? Type 'y' or 'n'" )
                     if choice == "n":
                         game = False
                         blackjack = False
                     elif choice == "y":
-                        count_computer = 0
+                        game = True
+                        count_comp = 0
                         count_user = 0
                         user = []
                         comp = []
@@ -57,25 +64,41 @@ while blackjack:
                     else:
                         blackjack = False
             elif choice == "n":
-                while count_computer < 17:
+                while count_comp < 17:
                     comp.append(random.choice(cards))
-                    count_computer = 0
+                    count_comp = 0
                     for add in comp:
-                        count_computer += add
+                        count_comp += add
+                    if 11 in comp and count_comp > 21:
+                        comp[comp.index(11)] = 1
+                        count_comp -= 10
+
+
                 print(f"Your final hand: {user}, current score: {count_user}")
-                print(f"Computer's final hand: {comp}, final score: {count_computer}")
-                game = False
-                blackjack = False
-                if count_computer > 21 and count_user <= 21:
+                print(f"Computer's final hand: {comp}, final score: {count_comp}")
+
+                if count_comp > 21 or count_comp < count_user:
                     print("U Win")
-                elif count_computer > count_user:
+                elif count_comp > count_user:
                     print("U lose")
-                elif count_computer == count_user:
+                elif count_comp == count_user:
                     print("Draw")
-                elif count_computer < count_user:
-                    print("U Win")
+                game = False
 
+        game = False
 
+        if blackjack:
+            choice = input("Do u want to play a game of Blackjack? Type 'y' or 'n'")
+            if choice == "n":
+                blackjack = False
+            elif choice == "y":
+                game = True
+                count_comp = 0
+                count_user = 0
+                user = []
+                comp = []
+            else:
+                blackjack = False
 
     elif choice == "n":
         blackjack = False
