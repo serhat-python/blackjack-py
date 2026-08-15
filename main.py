@@ -1,106 +1,88 @@
-import art
 import random
+from art import logo
 
-def neustart():
-    global blackjack, game, count_comp, count_user, user, comp, choice
-    choice = input("Do u want to play again? Type 'y' or 'n'")
-    if choice == "n":
-        blackjack = False
-    elif choice == "y":
-        game = True
-        count_comp = 0
-        count_user = 0
-        user = []
-        comp = []
+
+def deal_card():
+    """Returns a random card from the deck"""
+    cards = [11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10]
+    card = random.choice(cards)
+    return card
+
+
+def calculate_score(cards):
+    """Take a list of cards and return the score calculated from the cards"""
+    if sum(cards) == 21 and len(cards) == 2:
+        return 0
+
+    if 11 in cards and sum(cards) > 21:
+        cards.remove(11)
+        cards.append(1)
+
+    return sum(cards)
+
+
+def compare(u_score, c_score):
+    """Compares the user score u_score against the computer score c_score."""
+    if u_score == c_score:
+        return "Draw 🙃"
+    elif c_score == 0:
+        return "Lose, opponent has Blackjack 😱"
+    elif u_score == 0:
+        return "Win with a Blackjack 😎"
+    elif u_score > 21:
+        return "You went over. You lose 😭"
+    elif c_score > 21:
+        return "Opponent went over. You win 😁"
+    elif u_score > c_score:
+        return "You win 😃"
     else:
-        blackjack = False
+        return "You lose 😤"
 
 
-def user_add():
-    global  count_user, user
-    user.append(random.choice(cards))
-    count_user = 0
-    for add in user:
-        count_user += add
-        if 11 in user and count_user > 21:
-            user[user.index(11)] = 1
-            count_user -= 10
+def play_game():
+    print(logo)
+    user_cards = []
+    computer_cards = []
+    computer_score = -1
+    user_score = -1
+    is_game_over = False
 
+    for _ in range(2):
+        user_cards.append(deal_card())
+        computer_cards.append(deal_card())
 
-def comp_add():
-    global comp, count_comp
-    comp.append(random.choice(cards))
-    count_comp = 0
-    for add in comp:
-        count_comp += add
-    if 11 in comp and count_comp > 21:
-        comp[comp.index(11)] = 1
-        count_comp -= 10
+    while not is_game_over:
+        user_score = calculate_score(user_cards)
+        computer_score = calculate_score(computer_cards)
+        print(f"Your cards: {user_cards}, current score: {user_score}")
+        print(f"Computer's first card: {computer_cards[0]}")
 
-
-cards = [11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10]
-
-choice = input("Do you want to play a game of blackjack? Type 'y' or 'n'")
-
-blackjack = True
-user = []
-comp = []
-
-count_user = 0
-count_comp= 0
-
-game = True
-
-while blackjack:
-    if choice == "y":
-        if count_user == 0:
-            print (art.logo)
-        user.append(random.choice(cards))
-        user.append(random.choice(cards))
-        comp.append(random.choice(cards))
-        for add in user:
-            count_user += add
-        while game:
-            print(f"Your cards: {user}, current score: {count_user}")
-            print(f"Computers first cards: {comp}")
-            if count_user == 21:
-                choice = "n"
+        if user_score == 0 or computer_score == 0 or user_score > 21:
+            is_game_over = True
+        else:
+            user_should_deal = input("Type 'y' to get another card, type 'n' to pass: ")
+            if user_should_deal == "y":
+                user_cards.append(deal_card())
             else:
-                choice = input("Type 'y' to get another card, type 'n' to pass: ")
-            if choice == "y":
-                user_add()
-                for add in comp:
-                    count_comp += add
-                if count_user > 21:
-                    print(f"Your final hand: {user}, current score: {count_user}")
-                    print(f"Computer's final hand: {comp}, final score: {count_comp}")
-                    print("You went over. You lose :(")
-                    game = False
-                    neustart()
-            elif choice == "n":
-                while count_comp < 17:
-                    comp_add()
+                is_game_over = True
 
-                print(f"Your final hand: {user}, current score: {count_user}")
-                print(f"Computer's final hand: {comp}, final score: {count_comp}")
+    while computer_score != 0 and computer_score < 17:
+        computer_cards.append(deal_card())
+        computer_score = calculate_score(computer_cards)
 
-                if count_comp > 21 or count_comp < count_user:
-                    print("U Win")
-                elif count_comp > count_user:
-                    print("U lose")
-                elif count_comp == count_user:
-                    print("Draw")
-                game = False
+    print(f"Your final hand: {user_cards}, final score: {user_score}")
+    print(f"Computer's final hand: {computer_cards}, final score: {computer_score}")
+    print(compare(user_score, computer_score))
 
-        game = False
 
-        if blackjack:
-            neustart()
+while input("Do you want to play a game of Blackjack? Type 'y' or 'n': ") == "y":
+    print("\n" * 20)
+    play_game()
 
-    elif choice == "n":
-        blackjack = False
-    else:
-        choice = input("pls enter y or n ")
+
+
+
+
 
 
 
